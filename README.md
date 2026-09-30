@@ -8,7 +8,7 @@ Online one-step-ahead forecasting for a target driven by exogenous inputs, with 
 - repository: https://github.com/Iquitim/lebre-research
 - DOI: [10.5281/zenodo.23049103](https://doi.org/10.5281/zenodo.23049103)
 
-The package reproduces the research code **bit for bit**. This is checked by the regression tests against references generated from the frozen code, and on real evaluation series in the research repository.
+The package reproduces the research code **bit for bit in the reference environment** (Windows, CPython 3.11, NumPy 2.2.5), checked against references generated from the frozen code and on real evaluation series in the research repository. On other platforms and NumPy versions, floating-point rounding differs in the last bits (~1e-14): the regression tests then require identical structural decisions and forecasts equal within 1e-9 of their scale.
 
 ```bash
 pip install lebre      # not yet published; for now: pip install ./packages/lebre

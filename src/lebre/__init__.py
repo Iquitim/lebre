@@ -2,7 +2,8 @@
 computational budget.
 
 This package implements **LEBRE v0.52-r1** (canonical configuration) exactly as specified and evaluated in the research
-record https://doi.org/10.5281/zenodo.23049103. The forecasts are bit-for-bit identical to the frozen research code.
+record https://doi.org/10.5281/zenodo.23049103. In the reference environment (Windows, CPython 3.11, NumPy 2.2.5) the forecasts are bit-for-bit identical to the frozen
+research code; elsewhere they agree up to floating-point rounding, with identical structural decisions in the tests.
 """
 from .model import Event, Forecast, Lebre
 
