@@ -22,7 +22,7 @@ def test_predict_observe_equals_step():
     for t in range(len(y)):
         fa = a.predict(X[t]); a.observe(y[t])
         fb = b.step(X[t], y[t])
-        assert fa == fb
+        assert fa.t == fb.t and np.array_equal([fa.value, fa.lower, fa.upper], [fb.value, fb.lower, fb.upper], equal_nan=True)
 
 
 def test_forecast_and_interval():
@@ -88,7 +88,8 @@ def test_save_load_roundtrip(tmp_path):
     p = tmp_path / "state.pkl"; a.save(p)
     b = Lebre.load(p)
     for t in range(1000, 2000):
-        assert a.step(X[t], y[t]) == b.step(X[t], y[t])
+        fa, fb = a.step(X[t], y[t]), b.step(X[t], y[t])
+        assert np.array_equal([fa.value, fa.lower, fa.upper], [fb.value, fb.lower, fb.upper], equal_nan=True)
 
 
 def test_load_rejects_foreign_pickle(tmp_path):
