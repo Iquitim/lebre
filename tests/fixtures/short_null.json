@@ -1,0 +1,27 @@
+{
+ "season": null,
+ "season2": null,
+ "events": [
+  [
+   490,
+   "closed",
+   "add",
+   "('in', 1)",
+   "None",
+   -0.3,
+   100
+  ],
+  [
+   1370,
+   "closed",
+   "add",
+   "('res',)",
+   "None",
+   -0.06,
+   100
+  ]
+ ],
+ "fp_total": 603375.6,
+ "coverage": 0.8986666666666666,
+ "final_structure": []
+}
