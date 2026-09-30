@@ -1,0 +1,2 @@
+# Store bytes exactly as committed (no line-ending conversion on any platform).
+* -text
