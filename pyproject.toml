@@ -25,6 +25,8 @@ dependencies = ["numpy>=1.24"]
 test = ["pytest>=7"]
 
 [project.urls]
+Source = "https://github.com/Iquitim/lebre"
+Issues = "https://github.com/Iquitim/lebre/issues"
 "Research record" = "https://github.com/Iquitim/lebre-research"
 "Research DOI" = "https://doi.org/10.5281/zenodo.23049103"
 

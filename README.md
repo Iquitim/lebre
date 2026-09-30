@@ -1,5 +1,7 @@
 # lebre
 
+[![tests](https://github.com/Iquitim/lebre/actions/workflows/tests.yml/badge.svg)](https://github.com/Iquitim/lebre/actions/workflows/tests.yml)
+
 Online one-step-ahead forecasting for a target driven by exogenous inputs, with **statistically tested structural changes**, within a budget of a few hundred floating-point operations per step.
 
 `lebre 0.1.0` implements **LEBRE v0.52-r1**, the frozen research version documented and evaluated in the research record:
