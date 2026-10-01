@@ -2,7 +2,7 @@
 
 [![tests](https://github.com/Iquitim/lebre/actions/workflows/tests.yml/badge.svg)](https://github.com/Iquitim/lebre/actions/workflows/tests.yml)
 
-Online one-step-ahead forecasting for a target driven by exogenous inputs, with **statistically tested structural changes**, within a budget of a few hundred floating-point operations per step.
+Online one-step-ahead forecasting for a target driven by exogenous inputs, with **statistically tested structural changes**, at a cost of a few hundred floating-point operations per step.
 
 `lebre 0.1.0` implements **LEBRE v0.52-r1**, the frozen research version documented and evaluated in the research record:
 - repository: https://github.com/Iquitim/lebre-research
@@ -11,7 +11,7 @@ Online one-step-ahead forecasting for a target driven by exogenous inputs, with 
 The package reproduces the research code **bit for bit in the reference environment** (Windows, CPython 3.11, NumPy 2.2.5), checked against references generated from the frozen code and on real evaluation series in the research repository. On other platforms and NumPy versions, floating-point rounding differs in the last bits (~1e-14): the regression tests then require identical structural decisions and forecasts equal within 1e-9 of their scale.
 
 ```bash
-pip install lebre      # not yet published; for now: pip install ./packages/lebre
+pip install git+https://github.com/Iquitim/lebre      # until the PyPI release; then: pip install lebre
 ```
 
 ## Usage

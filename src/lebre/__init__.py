@@ -1,5 +1,5 @@
-"""LEBRE — online one-step-ahead forecasting with statistically tested structural changes, within a small
-computational budget.
+"""LEBRE — online one-step-ahead forecasting with statistically tested structural changes, at a cost of a few hundred
+floating-point operations per step.
 
 This package implements **LEBRE v0.52-r1** (canonical configuration) exactly as specified and evaluated in the research
 record https://doi.org/10.5281/zenodo.23049103. In the reference environment (Windows, CPython 3.11, NumPy 2.2.5) the forecasts are bit-for-bit identical to the frozen
