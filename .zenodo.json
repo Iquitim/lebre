@@ -1,0 +1,30 @@
+{
+  "upload_type": "software",
+  "title": "lebre: online forecasting with statistically tested structural changes",
+  "creators": [
+    {
+      "name": "Lima, Silvano",
+      "orcid": "0009-0000-3868-6747"
+    }
+  ],
+  "description": "<p>Installable Python library implementing <strong>LEBRE v0.52-r1</strong>, an online one-step-ahead forecaster for a target driven by exogenous inputs, at a cost of a few hundred floating-point operations per step. Structural changes (adding, removing or swapping a whole input, or refining its lag response) are accepted only when an anytime-valid e-process of predictive improvement crosses a level set by an online multiple-testing rule.</p><p>The library implements the frozen research version documented and evaluated in the research record (doi:10.5281/zenodo.23049103). In the reference environment (Windows, CPython 3.11, NumPy 2.2.5) its forecasts are bit-for-bit identical to the frozen research code; on other platforms they agree up to floating-point rounding, with identical structural decisions in the regression tests.</p><p><strong>Scope and limits.</strong> The evaluation covers hydrology and building-energy series with 1-5 inputs and one-step forecasting; the pre-declared cost contract was narrowly missed; the testing mechanism did not improve accuracy over switching all inputs on. See the research record for the full evidence and its limits.</p>",
+  "license": "Apache-2.0",
+  "keywords": [
+    "online forecasting",
+    "time series with exogenous inputs",
+    "anytime-valid inference",
+    "e-process",
+    "online multiple testing",
+    "TinyML",
+    "Python"
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "10.5281/zenodo.23049103",
+      "relation": "isDerivedFrom",
+      "scheme": "doi",
+      "resource_type": "software"
+    }
+  ],
+  "language": "eng"
+}
