@@ -11,7 +11,7 @@ Online one-step-ahead forecasting for a target driven by exogenous inputs, with 
 The package reproduces the research code **bit for bit in the reference environment** (Windows, CPython 3.11, NumPy 2.2.5), checked against references generated from the frozen code and on real evaluation series in the research repository. On other platforms and NumPy versions, floating-point rounding differs in the last bits (~1e-14): the regression tests then require identical structural decisions and forecasts equal within 1e-9 of their scale.
 
 ```bash
-pip install git+https://github.com/Iquitim/lebre      # until the PyPI release; then: pip install lebre
+pip install lebre
 ```
 
 ## Usage
