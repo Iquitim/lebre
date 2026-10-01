@@ -1,4 +1,3 @@
-# Active once packages/lebre becomes its own repository.
 name: tests
 on: [push, pull_request]
 jobs:
