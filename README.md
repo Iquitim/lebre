@@ -1,6 +1,8 @@
 # lebre
 
 [![tests](https://github.com/Iquitim/lebre/actions/workflows/tests.yml/badge.svg)](https://github.com/Iquitim/lebre/actions/workflows/tests.yml)
+[![PyPI](https://img.shields.io/pypi/v/lebre)](https://pypi.org/project/lebre/)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23073983.svg)](https://doi.org/10.5281/zenodo.23073983)
 
 Online one-step-ahead forecasting for a target driven by exogenous inputs, with **statistically tested structural changes**, at a cost of a few hundred floating-point operations per step.
 
@@ -59,4 +61,13 @@ These are the limits of the evaluated version, stated honestly (details in the s
 
 ## Licence
 
-Apache-2.0. If you use it, please cite the research record (`CITATION.cff`).
+Apache-2.0.
+
+## Citation
+
+If you use the library, please cite the research record it implements, and the library version you used:
+
+- Lima, S. (2026). *LEBRE research record — v0.52-r1* [Software]. Zenodo. https://doi.org/10.5281/zenodo.23049103
+- Lima, S. (2026). *lebre 0.1.0* [Software]. Zenodo. https://doi.org/10.5281/zenodo.23073984
+
+`10.5281/zenodo.23073983` resolves to the latest version of the library. See also `CITATION.cff`.

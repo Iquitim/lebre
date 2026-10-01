@@ -3,6 +3,8 @@ message: "If you use this software, please cite the LEBRE research record it imp
 type: software
 title: "lebre: online forecasting with statistically tested structural changes"
 version: "0.1.0"
+doi: "10.5281/zenodo.23073984"
+date-released: "2026-10-01"
 authors:
   - family-names: "Lima"
     given-names: "Silvano"
