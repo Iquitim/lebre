@@ -70,4 +70,4 @@ Apache-2.0.
 If you use the library, please cite the research record it implements and the library version you used (see `CITATION.cff`):
 
 - research record of LEBRE v0.53: https://doi.org/10.5281/zenodo.23282527 (repository: https://github.com/Iquitim/lebre-research);
-- `lebre 0.1.0`: https://doi.org/10.5281/zenodo.23073984; `10.5281/zenodo.23073983` resolves to the latest version of the library.
+- `lebre 0.2.0`: https://doi.org/10.5281/zenodo.23282624; `lebre 0.1.0`: https://doi.org/10.5281/zenodo.23073984; `10.5281/zenodo.23073983` resolves to the latest version of the library.

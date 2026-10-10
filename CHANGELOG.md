@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.2.0 — unreleased
+## 0.2.0 — 2026-10-10
 
 Implements **LEBRE v0.53** (canonical configuration), promoted on 2026-10-09 by a pre-registered rule in the research
 record (https://doi.org/10.5281/zenodo.23282527; promoted prototype at commit 4a2620e).
