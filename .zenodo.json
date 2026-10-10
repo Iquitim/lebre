@@ -7,7 +7,7 @@
       "orcid": "0009-0000-3868-6747"
     }
   ],
-  "description": "<p>Installable Python library implementing <strong>LEBRE v0.52-r1</strong>, an online one-step-ahead forecaster for a target driven by exogenous inputs, at a cost of a few hundred floating-point operations per step. Structural changes (adding, removing or swapping a whole input, or refining its lag response) are accepted only when an anytime-valid e-process of predictive improvement crosses a level set by an online multiple-testing rule.</p><p>The library implements the frozen research version documented and evaluated in the research record (doi:10.5281/zenodo.23049103). In the reference environment (Windows, CPython 3.11, NumPy 2.2.5) its forecasts are bit-for-bit identical to the frozen research code; on other platforms they agree up to floating-point rounding, with identical structural decisions in the regression tests.</p><p><strong>Scope and limits.</strong> The evaluation covers hydrology and building-energy series with 1-5 inputs and one-step forecasting; the pre-declared cost contract was narrowly missed; the testing mechanism did not improve accuracy over switching all inputs on. See the research record for the full evidence and its limits.</p>",
+  "description": "<p>Installable Python library implementing <strong>LEBRE v0.53</strong>, an online one-step-ahead forecaster for a target driven by exogenous inputs, at a fixed per-step cost (median 919 floating-point operations per step in the final evaluation). It has three layers: a structural core (LEBRE v0.52-r1, unchanged) whose structural changes are accepted only when an anytime-valid e-process of predictive improvement crosses a level set by an online multiple-testing rule; M1, a precision expert combined with the core by AdaHedge; and M2, which starts the output from a declared trivial reference and combines two paths by an (A,B)-Prod. The core alone (identical to lebre 0.1.0) remains available.</p><p>LEBRE v0.53 was promoted by a pre-registered rule in the research record (doi:10.5281/zenodo.23282527; https://github.com/Iquitim/lebre-research): on 104 reserved series its mean squared error was 0.955 of the core's (95% CI 0.951-0.960), with no harm in any family. In the reference environment (Windows, CPython 3.11, NumPy 2.2.5) its forecasts are bit-for-bit identical to the promoted research code.</p><p><strong>Scope and limits.</strong> One-step forecasting; the gain came from basins and FX, with no gain in solar, wind and load; about twice the cost of the core; no formal guarantee in the original scale for M1 and M2; no component is original. See the research record for the full evidence and its limits.</p>",
   "license": "Apache-2.0",
   "keywords": [
     "online forecasting",
@@ -20,7 +20,7 @@
   ],
   "related_identifiers": [
     {
-      "identifier": "10.5281/zenodo.23049103",
+      "identifier": "10.5281/zenodo.23282527",
       "relation": "isDerivedFrom",
       "scheme": "doi",
       "resource_type": "software"

@@ -28,6 +28,7 @@ print(f"90% interval coverage: {model.coverage:.3f}")
 print(f"active structure: {model.structure}")
 print("recovered response of x0 (lags, weight per lag):", [(seg, round(w, 3)) for seg, w in model.response("x0")])
 print(f"analytic cost: {model.cost_per_step:.0f} floating-point operations per step")
+print("weights of the layers M1 and M2:", model.layer_weights)
 for e in model.events:
     if e.outcome == "accepted":
         print(f"  t={e.t}: {e.change} {e.added} (log evidence {e.log_evidence}, {e.samples} samples)")
