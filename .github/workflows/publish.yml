@@ -1,24 +1,62 @@
-# Publishes to PyPI with trusted publishing (no stored tokens).
-# - Manual run (Actions > publish > Run workflow): uploads to TestPyPI.
-# - Publishing a GitHub release whose tag is v<version>: uploads to PyPI.
+# Release flow (trusted publishing: no stored tokens). The file name must stay "publish.yml": it is the name registered
+# as trusted publisher on PyPI and TestPyPI.
+#
+# - Pull request: tests and builds the package; if the PR changes the version to one that has no tag yet, it also
+#   requires a "## <version>" section in CHANGELOG.md (the release notes).
+# - Merge into main that changes the version (no tag v<version> yet): tests, builds, publishes to PyPI and only then
+#   creates the tag and the GitHub release v<version>, with the CHANGELOG.md section as notes (Zenodo archives the
+#   release and mints the DOI). Merges that keep the version publish nothing.
+# - Manual run (Actions > publish > Run workflow): uploads the current version to TestPyPI, as a rehearsal.
 name: publish
 on:
-  release:
-    types: [published]
+  push:
+    branches: [main]
+  pull_request:
   workflow_dispatch:
+
+concurrency:
+  group: publish-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
+  check:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.v.outputs.version }}
+      release: ${{ steps.v.outputs.release }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: New version? (no tag v<version> yet)
+        id: v
+        run: |
+          v=$(python -c "import tomllib;print(tomllib.load(open('pyproject.toml','rb'))['project']['version'])")
+          echo "version=$v" >> "$GITHUB_OUTPUT"
+          if git rev-parse -q --verify "refs/tags/v$v" >/dev/null; then
+            echo "release=false" >> "$GITHUB_OUTPUT"; echo "v$v already released: nothing to publish"
+          else
+            echo "release=true" >> "$GITHUB_OUTPUT"; echo "v$v is new"
+          fi
+      - name: Release notes present in CHANGELOG.md
+        if: steps.v.outputs.release == 'true'
+        run: |
+          v="${{ steps.v.outputs.version }}"
+          awk -v v="$v" '$0 ~ "^## "v"( |$)" {f=1; next} /^## / {f=0} f' CHANGELOG.md > notes.md
+          test -s notes.md || { echo "CHANGELOG.md has no '## $v' section"; exit 1; }
+          cat notes.md
+
   build:
+    needs: check
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - name: Tag matches the package version
-        if: github.event_name == 'release'
-        run: |
-          v=$(python -c "import tomllib;print(tomllib.load(open('pyproject.toml','rb'))['project']['version'])")
-          test "${GITHUB_REF_NAME}" = "v$v" || { echo "tag ${GITHUB_REF_NAME} does not match version $v"; exit 1; }
       - name: Test
         run: |
           python -m pip install ".[test]"
@@ -50,8 +88,8 @@ jobs:
           repository-url: https://test.pypi.org/legacy/
 
   pypi:
-    if: github.event_name == 'release'
-    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.check.outputs.release == 'true'
+    needs: [check, build]
     runs-on: ubuntu-latest
     environment: pypi
     permissions:
@@ -62,3 +100,22 @@ jobs:
           name: dist
           path: dist/
       - uses: pypa/gh-action-pypi-publish@release/v1
+
+  github-release:
+    needs: [check, pypi]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+      - name: Tag and release v<version> (after PyPI succeeded)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          v="${{ needs.check.outputs.version }}"
+          awk -v v="$v" '$0 ~ "^## "v"( |$)" {f=1; next} /^## / {f=0} f' CHANGELOG.md > notes.md
+          gh release create "v$v" dist/* --target "$GITHUB_SHA" --title "lebre $v" --notes-file notes.md
