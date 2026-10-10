@@ -6,7 +6,7 @@
 
 Online one-step-ahead forecasting for a target driven by exogenous inputs, with **statistically tested structural changes**, a **precision expert** and a **trivial-reference starting point**, at a fixed cost of a few hundred to under two thousand floating-point operations per step.
 
-`lebre 0.2.0` implements **LEBRE v0.53**, the research version promoted on 2026-10-09 by a pre-registered rule. The research record (code, pre-registrations, evaluations, self-contained specification) is https://github.com/Iquitim/lebre-research (specification: `docs/architecture/pdf/LEBRE_ARCHITECTURE_v0.53_SPEC_r1_EN.pdf`).
+`lebre 0.2.0` implements **LEBRE v0.53**, the research version promoted on 2026-10-09 by a pre-registered rule. The research record (code, pre-registrations, evaluations, self-contained specification) is https://doi.org/10.5281/zenodo.23282527 (repository: https://github.com/Iquitim/lebre-research) (specification: `docs/architecture/pdf/LEBRE_ARCHITECTURE_v0.53_SPEC_r1_EN.pdf`).
 
 The package reproduces the promoted research code **bit for bit in the reference environment** (Windows, CPython 3.11, NumPy 2.2.5), checked against references generated from that code. On other platforms and NumPy versions, floating-point rounding differs in the last bits: the regression tests then require identical decisions and forecasts equal within 1e-9 of their scale.
 
@@ -69,5 +69,5 @@ Apache-2.0.
 
 If you use the library, please cite the research record it implements and the library version you used (see `CITATION.cff`):
 
-- research record: https://github.com/Iquitim/lebre-research (archive of v0.52-r1: https://doi.org/10.5281/zenodo.23049103);
+- research record of LEBRE v0.53: https://doi.org/10.5281/zenodo.23282527 (repository: https://github.com/Iquitim/lebre-research);
 - `lebre 0.1.0`: https://doi.org/10.5281/zenodo.23073984; `10.5281/zenodo.23073983` resolves to the latest version of the library.

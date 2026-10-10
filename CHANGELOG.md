@@ -3,7 +3,7 @@
 ## 0.2.0 — unreleased
 
 Implements **LEBRE v0.53** (canonical configuration), promoted on 2026-10-09 by a pre-registered rule in the research
-record (https://github.com/Iquitim/lebre-research; promoted prototype at commit 4a2620e).
+record (https://doi.org/10.5281/zenodo.23282527; promoted prototype at commit 4a2620e).
 
 **Breaking:** `Lebre` is now the complete LEBRE v0.53. The structural core alone (LEBRE v0.52-r1, the whole of 0.1.0)
 is `LebreCore`, or `Lebre(..., core_only=True)`; both give exactly the forecasts of 0.1.0. `pip install "lebre==0.1.0"`
