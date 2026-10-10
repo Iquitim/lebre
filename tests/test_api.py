@@ -3,7 +3,7 @@ import math
 import numpy as np
 import pytest
 
-from lebre import ALGORITHM_VERSION, Event, Forecast, Lebre, __version__
+from lebre import ALGORITHM_VERSION, CORE_ALGORITHM_VERSION, Event, Forecast, Lebre, LebreCore, __version__
 
 
 def _data(T=3000, seed=0):
@@ -13,7 +13,7 @@ def _data(T=3000, seed=0):
 
 
 def test_versions():
-    assert __version__ == "0.1.0" and ALGORITHM_VERSION == "LEBRE v0.52-r1"
+    assert __version__ == "0.2.0" and ALGORITHM_VERSION == "LEBRE v0.53" and CORE_ALGORITHM_VERSION == "LEBRE v0.52-r1"
 
 
 def test_predict_observe_equals_step():
@@ -97,3 +97,34 @@ def test_load_rejects_foreign_pickle(tmp_path):
     p = tmp_path / "x.pkl"; pickle.dump({"a": 1}, open(p, "wb"))
     with pytest.raises(ValueError):
         Lebre.load(p)
+
+
+def test_reference_validation_and_default():
+    assert Lebre(1).reference == "persistence" and Lebre(1, season=24).reference == "seasonal"
+    assert Lebre(1, reference="zero").reference == "zero"
+    with pytest.raises(ValueError):
+        Lebre(1, reference="seasonal")
+    with pytest.raises(ValueError):
+        Lebre(1, reference="mean")
+
+
+def test_layer_weights_and_gate_events():
+    X, y = _data(3000)
+    m = Lebre(2)
+    for t in range(len(y)):
+        m.step(X[t], y[t])
+    w = m.layer_weights
+    assert set(w) == {"m1", "m1_inputs", "h", "w", "s"} and 0.0 <= w["m1"] <= 1.0 and 0.0 < w["s"] < 1.0
+    assert abs(sum(w["h"]) - 1) < 1e-12 and abs(sum(w["w"]) - 1) < 1e-12
+    assert all(e.added in ("adaptive", "reference") for e in m.events if e.change == "gate")
+    assert m.cost_per_step > LebreCore(2).cost_per_step if LebreCore(2).n_steps else True
+
+
+def test_core_state_files_of_0_1_0_still_load(tmp_path):
+    X, y = _data(500)
+    a = LebreCore(2)
+    for t in range(500):
+        a.step(X[t], y[t])
+    p = tmp_path / "core.pkl"; a.save(p)
+    b = Lebre.load(p)
+    assert isinstance(b, LebreCore) and b.n_steps == 500

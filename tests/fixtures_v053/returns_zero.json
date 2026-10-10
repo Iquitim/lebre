@@ -1,0 +1,25 @@
+{
+ "inputs": "here",
+ "season": null,
+ "season2": null,
+ "reference": "zero",
+ "events": [
+  [
+   5290,
+   "closed",
+   "add",
+   -0.04,
+   100
+  ],
+  [
+   5930,
+   "closed",
+   "add",
+   -0.1,
+   100
+  ]
+ ],
+ "cost_per_step": 799.5638333333334,
+ "coverage": 0.9013333333333333,
+ "m1_weight": 1.4345791932391368e-52
+}

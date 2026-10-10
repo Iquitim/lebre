@@ -1,0 +1,32 @@
+{
+ "inputs": "fixtures",
+ "season": null,
+ "season2": null,
+ "reference": null,
+ "events": [
+  [
+   190,
+   "accepted",
+   "gate",
+   6.16,
+   190
+  ],
+  [
+   490,
+   "closed",
+   "add",
+   -0.3,
+   100
+  ],
+  [
+   1370,
+   "closed",
+   "add",
+   -0.06,
+   100
+  ]
+ ],
+ "cost_per_step": 476.8502,
+ "coverage": 0.8986666666666666,
+ "m1_weight": 2.6739272612958277e-14
+}

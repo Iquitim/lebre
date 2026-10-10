@@ -2,18 +2,20 @@ cff-version: 1.2.0
 message: "If you use this software, please cite the LEBRE research record it implements."
 type: software
 title: "lebre: online forecasting with statistically tested structural changes"
-version: "0.1.0"
-doi: "10.5281/zenodo.23073984"
-date-released: "2026-10-01"
+version: "0.2.0"
+doi: "10.5281/zenodo.23073983"
+date-released: "2026-10-10"
 authors:
   - family-names: "Lima"
     given-names: "Silvano"
     orcid: "https://orcid.org/0009-0000-3868-6747"
 license: Apache-2.0
+repository-code: "https://github.com/Iquitim/lebre"
 references:
   - type: software
-    title: "LEBRE research record — v0.52-r1"
+    title: "LEBRE research record (v0.53 promoted; v0.52-r1 archive)"
     authors:
       - family-names: "Lima"
         given-names: "Silvano"
+    repository-code: "https://github.com/Iquitim/lebre-research"
     doi: "10.5281/zenodo.23049103"

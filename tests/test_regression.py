@@ -1,4 +1,5 @@
-"""Regression against the frozen research implementation of LEBRE v0.52-r1.
+"""Regression of the structural core (LebreCore, unchanged from lebre 0.1.0) against the frozen research implementation
+of LEBRE v0.52-r1.
 
 The fixtures were produced by dev/make_fixtures.py from the frozen research code (causal input standardiser +
 LebreV052H, canonical configuration). They cover: acceptance of inputs and of the residual state, hierarchical splits,
@@ -11,6 +12,7 @@ Two levels:
 - on any other platform or NumPy version, floating-point rounding differs in the last bits, so the structural decisions
   (every event, in order, with its evidence) must be identical and the forecasts must agree to a tight tolerance.
 """
+import functools
 import json
 import platform
 import sys
@@ -19,7 +21,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from lebre import Lebre
+from lebre import LebreCore as Lebre
 
 FIX = Path(__file__).parent / "fixtures"
 NAMES = sorted(p.stem for p in FIX.glob("*.npz"))
@@ -31,6 +33,7 @@ def _unit(model, s):
     return None if s == "None" else model.unit_name(eval(s))   # keys are stored as repr() of tuples of ints/str
 
 
+@functools.lru_cache(maxsize=None)                       # each scenario runs once for both test levels
 def _run(name):
     Z = np.load(FIX / f"{name}.npz"); meta = json.load(open(FIX / f"{name}.json", encoding="utf-8"))
     X, y, q = Z["X"], Z["y"], Z["q"]
