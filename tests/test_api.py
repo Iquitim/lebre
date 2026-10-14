@@ -13,7 +13,7 @@ def _data(T=3000, seed=0):
 
 
 def test_versions():
-    assert __version__ == "0.2.0" and ALGORITHM_VERSION == "LEBRE v0.53" and CORE_ALGORITHM_VERSION == "LEBRE v0.52-r1"
+    assert __version__ == "0.3.0" and ALGORITHM_VERSION == "LEBRE v0.54" and CORE_ALGORITHM_VERSION == "LEBRE v0.52-r1"
 
 
 def test_predict_observe_equals_step():
@@ -128,3 +128,57 @@ def test_core_state_files_of_0_1_0_still_load(tmp_path):
     p = tmp_path / "core.pkl"; a.save(p)
     b = Lebre.load(p)
     assert isinstance(b, LebreCore) and b.n_steps == 500
+
+
+V053 = dict(dormancy=False, cheap_equivalents=False, triggered_removal=False)
+
+
+@pytest.mark.parametrize("flags", [dict(dormancy=d, cheap_equivalents=c, triggered_removal=r)
+                                   for d in (False, True) for c in (False, True) for r in (False, True)])
+def test_save_load_roundtrip_for_every_combination(tmp_path, flags):
+    X, y = _data(1600)
+    a = Lebre(2, **flags)
+    for t in range(800):
+        a.step(X[t], y[t])
+    p = tmp_path / "state.pkl"; a.save(p)
+    b = Lebre.load(p)
+    assert type(b.core._core) is type(a.core._core) and (b.dormancy, b.cheap_equivalents, b.triggered_removal) == (
+        flags["dormancy"], flags["cheap_equivalents"], flags["triggered_removal"])
+    for t in range(800, 1600):
+        fa, fb = a.step(X[t], y[t]), b.step(X[t], y[t])
+        assert np.array_equal([fa.value, fa.lower, fa.upper], [fb.value, fb.lower, fb.upper], equal_nan=True)
+
+
+def test_dormancy_state():
+    X, y = _data(6000)
+    m = Lebre(2)
+    for t in range(len(y)):
+        m.step(X[t], y[t])
+    st = m.dormancy_state
+    assert set(st) == {"dormant", "sleeps", "wakes", "trials", "dormant_steps"} and st["sleeps"] >= 1
+    assert Lebre(2, dormancy=False).dormancy_state is None and Lebre(2, core_only=True).dormancy_state is None
+
+
+def test_state_files_of_0_2_0_still_load_and_go_on_as_v053(tmp_path):
+    import pickle
+    X, y = _data(1600)
+    a, ref = Lebre(2, **V053), Lebre(2, **V053)
+    for t in range(800):
+        a.step(X[t], y[t]); ref.step(X[t], y[t])
+    for k in V053:                                     # a Lebre of lebre 0.2.0 has none of these attributes
+        del a.__dict__[k]
+    p = tmp_path / "v020.pkl"
+    pickle.dump({"format": "lebre-state", "version": 2, "model": a}, open(p, "wb"))
+    b = Lebre.load(p)
+    assert (b.dormancy, b.cheap_equivalents, b.triggered_removal) == (False, False, False) and b.dormancy_state is None
+    for t in range(800, 1600):
+        assert b.step(X[t], y[t]).value == ref.step(X[t], y[t]).value
+    assert "dormancy=False" in repr(b)
+
+
+def test_flags_off_is_v053_and_defaults_are_v054():
+    m = Lebre(2)
+    assert (m.dormancy, m.cheap_equivalents, m.triggered_removal) == (True, True, True)
+    assert type(m.core._core).__name__ == "TriggeredRemovalCheapCore" and type(m._m1).__name__ == "DormantPrecisionExpert"
+    v = Lebre(2, **V053)
+    assert type(v.core._core).__name__ == "Core" and type(v._m1).__name__ == "PrecisionExpert"

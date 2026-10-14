@@ -4,8 +4,8 @@ build-backend = "hatchling.build"
 
 [project]
 name = "lebre"
-version = "0.2.0"
-description = "Online one-step-ahead forecasting with statistically tested structural changes, a precision expert and a trivial-reference starting point, at a fixed cost per step (implements LEBRE v0.53)."
+version = "0.3.0"
+description = "Online one-step-ahead forecasting with statistically tested structural changes, a precision expert and a trivial-reference starting point, at a fixed cost per step (implements LEBRE v0.54)."
 readme = "README.md"
 license = "Apache-2.0"
 license-files = ["LICENSE"]
@@ -28,7 +28,7 @@ test = ["pytest>=7"]
 Source = "https://github.com/Iquitim/lebre"
 Issues = "https://github.com/Iquitim/lebre/issues"
 "Research record" = "https://github.com/Iquitim/lebre-research"
-"Research DOI" = "https://doi.org/10.5281/zenodo.23049103"
+"Research DOI" = "https://doi.org/10.5281/zenodo.23376152"
 
 [tool.hatch.build.targets.sdist]
 include = ["src/lebre", "tests", "examples", "README.md", "LICENSE", "CHANGELOG.md", "CITATION.cff"]

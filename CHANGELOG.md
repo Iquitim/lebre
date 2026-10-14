@@ -1,5 +1,44 @@
 # Changelog
 
+## 0.3.0 — unreleased
+
+Implements **LEBRE v0.54** (canonical configuration), promoted on 2026-10-13 by a pre-registered rule in the research
+record (https://doi.org/10.5281/zenodo.23376152; frozen prototype at commit f9906c4: promoted code cfe72ce + errata 01,
+which keeps the same forecasts).
+
+**Changed:** `Lebre` is now LEBRE v0.54. Three changes, each with its own switch, all on by default:
+- `dormancy`: M1 sleeps while its weight stays below 1e-3 for 2,000 targets (computed only on a sample step every 8,
+  regression updated every 64) and wakes when the samples show its improvement over the core (M5a);
+- `cheap_equivalents`: the report of equivalent inputs is updated by rows from one sample every 31 steps; no effect on
+  forecasts or decisions (M5b, revision 2 of errata 01);
+- `triggered_removal`: when a unit's mean contribution falls below half its peak, a removal test opens with a new
+  hypothesis, per-episode evidence, its own e-LOND budget, at most 10,000 steps and at least 5,000 before acceptance; it
+  takes priority over a periodic removal test of the same unit, which is closed as "superseded" (M4).
+
+With the three switches off, the forecasts are those of 0.2.0 (LEBRE v0.53), bit for bit in the reference environment.
+`core_only=True` now gives the structural core of v0.54; with `cheap_equivalents=False, triggered_removal=False` it is
+the core of 0.1.0, as is `LebreCore` (unchanged). `pip install "lebre==0.2.0"` remains available.
+
+**New:** `dormancy_state`; state format 3. State files of 0.2.0 still load with `Lebre.load` and go on as LEBRE v0.53;
+those of 0.1.0 (`LebreCore`) too.
+
+**Fidelity.** In the reference environment (Windows, CPython 3.11, NumPy 2.2.5), forecasts, interval, events, cost
+accounting, coverage, the M1 weight, the dormancy state, the accepted triggered removals and the reports of equivalent
+inputs are bit-for-bit identical to the promoted research prototype on thirteen scenarios (`tests/test_v054.py`: the ten
+of 0.2.0 plus a target where M1 sleeps while a later joint dynamics is absorbed by the core, a relation that vanishes and
+is removed by a triggered test, and forty inputs in correlated groups). The three new modules have the same syntax tree
+as the prototype's, apart from names, comments and docstrings. The modules of 0.2.0 other than `full.py` and
+`__init__.py` are unchanged.
+
+**Scope and limits** (research record, specification §22): the cost cut is about 10% at the median and none where M1
+helps; a relation that disappears for more than about 5,200 steps and returns is removed and must be re-detected (+5% to
++10% error on series with that pattern); spurious inputs in level series can still be accepted and the cycle must still
+be declared.
+
+**Differences from the research prototype** (no effect on results): only the promoted configuration was ported (the
+prototype's cycle-as-hypothesis draft, off in v0.54, was left out); names in English; the core classes are named (so
+states can be pickled) instead of built at run time.
+
 ## 0.2.0 — 2026-10-10
 
 Implements **LEBRE v0.53** (canonical configuration), promoted on 2026-10-09 by a pre-registered rule in the research

@@ -1,0 +1,167 @@
+{
+ "inputs": "here",
+ "season": null,
+ "season2": null,
+ "reference": null,
+ "events": [
+  [
+   490,
+   "accepted",
+   "gate",
+   6.91,
+   390
+  ],
+  [
+   620,
+   "accepted",
+   "add",
+   6.16,
+   310
+  ],
+  [
+   720,
+   "closed",
+   "remove",
+   -1.2,
+   100
+  ],
+  [
+   1510,
+   "closed",
+   "split",
+   -0.14,
+   100
+  ],
+  [
+   2710,
+   "closed",
+   "split",
+   -0.06,
+   100
+  ],
+  [
+   2810,
+   "closed",
+   "remove",
+   -1.84,
+   100
+  ],
+  [
+   4140,
+   "closed",
+   "split",
+   -0.12,
+   100
+  ],
+  [
+   4790,
+   "closed",
+   "add",
+   -0.16,
+   100
+  ],
+  [
+   5050,
+   "closed",
+   "split",
+   -0.1,
+   100
+  ],
+  [
+   5150,
+   "closed",
+   "remove",
+   -2.29,
+   100
+  ],
+  [
+   5400,
+   "closed",
+   "add",
+   -0.12,
+   100
+  ],
+  [
+   6150,
+   "closed",
+   "split",
+   -0.17,
+   100
+  ],
+  [
+   7280,
+   "closed",
+   "split",
+   -0.28,
+   100
+  ],
+  [
+   7380,
+   "closed",
+   "remove",
+   -2.7,
+   100
+  ],
+  [
+   9430,
+   "closed",
+   "split",
+   -0.37,
+   104
+  ],
+  [
+   9530,
+   "closed",
+   "remove",
+   -3.08,
+   100
+  ],
+  [
+   12410,
+   "closed",
+   "split",
+   -0.57,
+   2630
+  ],
+  [
+   12510,
+   "closed",
+   "remove",
+   -3.54,
+   100
+  ],
+  [
+   13710,
+   "closed",
+   "add",
+   -0.29,
+   100
+  ],
+  [
+   15060,
+   "closed",
+   "add",
+   -0.23,
+   200
+  ],
+  [
+   15450,
+   "closed",
+   "add",
+   -0.33,
+   100
+  ]
+ ],
+ "cost_per_step": 652.6702874999999,
+ "coverage": 0.8996875,
+ "m1_weight": 8.196088515546674e-12,
+ "dormancy": {
+  "dormant": true,
+  "sleeps": 1,
+  "wakes": 0,
+  "trials": 0,
+  "dormant_steps": 11226
+ },
+ "triggered_removals": 0,
+ "equivalents": null
+}

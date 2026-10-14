@@ -1,0 +1,34 @@
+{
+ "inputs": "fixtures_v053",
+ "season": null,
+ "season2": null,
+ "reference": "zero",
+ "events": [
+  [
+   5290,
+   "closed",
+   "add",
+   -0.04,
+   100
+  ],
+  [
+   5930,
+   "closed",
+   "add",
+   -0.1,
+   100
+  ]
+ ],
+ "cost_per_step": 582.7925,
+ "coverage": 0.9013333333333333,
+ "m1_weight": 6.5871164292712816e-71,
+ "dormancy": {
+  "dormant": true,
+  "sleeps": 1,
+  "wakes": 0,
+  "trials": 0,
+  "dormant_steps": 3661
+ },
+ "triggered_removals": 0,
+ "equivalents": null
+}

@@ -1,4 +1,6 @@
-"""Regression of the complete LEBRE (v0.53: structural core + M1 + M2) against the promoted research implementation.
+"""Regression of LEBRE v0.53 (structural core + M1 + M2), i.e. `Lebre` with the three v0.54 changes switched off,
+against the promoted research implementation of v0.53: lebre 0.3.0 with dormancy, cheap_equivalents and
+triggered_removal False must reproduce lebre 0.2.0.
 
 The fixtures (tests/fixtures_v053/) were produced by dev/make_fixtures_v053.py from the promoted prototype (commit
 4a2620e, canonical call). They reuse the seven scenarios of tests/fixtures/ and add three where the new layers act:
@@ -6,7 +8,7 @@ joint dynamics (M1 takes over), returns with reference zero and a shock, and a r
 
 Two levels, as for the core: bit for bit in the reference environment (Windows, CPython 3.11, NumPy 2.2.5); elsewhere,
 identical decisions (core and gate audit) and forecasts within 1e-9 of their scale. A third test checks that
-core_only=True reproduces lebre 0.1.0 exactly.
+core_only=True with the v0.54 core changes off reproduces lebre 0.1.0 exactly.
 """
 import functools
 import json
@@ -18,6 +20,8 @@ import numpy as np
 import pytest
 
 from lebre import Lebre, LebreCore
+
+V053 = dict(dormancy=False, cheap_equivalents=False, triggered_removal=False)
 
 FIX1 = Path(__file__).parent / "fixtures"
 FIX = Path(__file__).parent / "fixtures_v053"
@@ -34,7 +38,7 @@ def _inputs(name, meta):
 def _run(name):
     meta = json.load(open(FIX / f"{name}.json", encoding="utf-8")); E = np.load(FIX / f"{name}.npz")
     X, y, q = _inputs(name, meta)
-    m = Lebre(X.shape[1], season=meta["season"], season2=meta["season2"], reference=meta["reference"])
+    m = Lebre(X.shape[1], season=meta["season"], season2=meta["season2"], reference=meta["reference"], **V053)
     f, lo, hi = (np.empty(len(y)) for _ in range(3))
     for t in range(len(y)):
         fc = m.step(X[t], None if not np.isfinite(y[t]) else float(y[t]), quarantine=bool(q[t]))
@@ -71,7 +75,8 @@ def test_bit_for_bit_in_reference_environment(name):
 def test_core_only_is_lebre_0_1_0(name):
     Z = dict(np.load(FIX1 / f"{name}.npz")); meta = json.load(open(FIX1 / f"{name}.json", encoding="utf-8"))   # load once
     X, y, q = Z["X"], Z["y"], Z["q"]
-    a = Lebre(X.shape[1], season=meta["season"], season2=meta["season2"], core_only=True)
+    a = Lebre(X.shape[1], season=meta["season"], season2=meta["season2"], core_only=True, cheap_equivalents=False,
+              triggered_removal=False)
     f = np.array([a.step(X[t], None if not np.isfinite(y[t]) else float(y[t]), bool(q[t])).value for t in range(len(y))])
     assert isinstance(a.core, LebreCore) and a.layer_weights is None
     assert [(e.t, e.outcome, e.samples) for e in a.events] == [(t, o, n) for t, o, k, ad, r, le, n in meta["events"]]
