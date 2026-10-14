@@ -11,3 +11,9 @@ The fixtures are synthetic (seeds 5301–5307) and cover acceptance of inputs an
     python dev/make_fixtures_v053.py
 
 It reuses the seven scenarios above and adds three (seeds 5311–5313) where M1 and M2 act: joint dynamics where M1 takes over, returns with reference zero and a shock, and a random-walk level with a target gap.
+
+`make_fixtures_v054.py` regenerates `tests/fixtures_v054/` from the **promoted research implementation of LEBRE v0.54** (research repository at commit f9906c4 or later; the prototype is frozen). Set `LEBRE054_PROTO` to its folder `experiments/LEBRE-V0.54-PROTO-01` and run, from this repository's root:
+
+    python dev/make_fixtures_v054.py
+
+It reuses the ten scenarios above and adds three (seeds 5461–5463): a target where M1 sleeps while a joint dynamics that appears later is absorbed by the core (M1 stays asleep), a relation that vanishes for good and is removed by a triggered test, and forty inputs in four-input correlated groups, with the reports of equivalent inputs queried in the middle of an update cycle and at the end. Across the thirteen scenarios M1 sleeps, wakes by evidence (`hourly_gaps`, `random_walk_level`) and wakes on trial after a reselection (`many_inputs`, `regime_change`, `many_inputs_equivalents`), and triggered removals are accepted (`effect_vanishes`, `regime_change`, `relation_vanishes`). A periodic removal test superseded by a triggered one does not occur in them.

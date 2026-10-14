@@ -1,13 +1,18 @@
-"""Public API of the complete LEBRE (implements LEBRE v0.53: structural core + M1 + M2, canonical configuration).
+"""Public API of the complete LEBRE (implements LEBRE v0.54: structural core + M1 + M2, canonical configuration).
 
-The structural core is `lebre.model.Lebre` (LEBRE v0.52-r1, unchanged; exported as `LebreCore`). On top of it:
+The structural core is `lebre.model.Lebre` (LEBRE v0.52-r1, unchanged; exported as `LebreCore`), with the two changes of
+v0.54 to the core: triggered removal tests with per-episode evidence and their own error budget (M4, `_removal.py`) and
+the cheap report of equivalent inputs (M5b, `_screening.py`). On top of it:
 - M1 combines the core forecast L with a precision expert E (recursive regression on the target's past and on lag-band
   means of the most correlated inputs) by AdaHedge on squared errors: L' = (1 - omega) L + omega E.
 - M2 starts the output from a declared trivial reference R (zero, persistence or seasonal naive) and mixes R and L'
   through two paths, H (AdaHedge) and W (one-way switch R -> L'), combined by a horizon-free (A,B)-Prod with losses
   normalised by a forgetting running maximum. An e-process with its own budget audits the switches (events only).
-Transcribed from the promoted research prototype (lebre-research, experiments/LEBRE-V0.53-PROTO-01, commit 4a2620e,
-canonical call saida="prod_q2", precisao="r5"), keeping the order of every floating-point operation."""
+- In v0.54, M1 sleeps while its weight is negligible and wakes by evidence (M5a, `_dormancy.py`).
+Transcribed from the promoted research prototypes (lebre-research: v0.53, experiments/LEBRE-V0.53-PROTO-01, commit
+4a2620e, canonical call saida="prod_q2", precisao="r5"; v0.54, experiments/LEBRE-V0.54-PROTO-01, commit f9906c4, canonical
+call m5a=m5b=m4=True, m6=False), keeping the order of every floating-point operation. With dormancy, cheap_equivalents
+and triggered_removal all False, the forecasts are those of lebre 0.2.0 (LEBRE v0.53), bit for bit."""
 from __future__ import annotations
 
 import math
@@ -17,9 +22,11 @@ from pathlib import Path
 from typing import Optional, Sequence
 
 from ._aggregation import FP_ADAHEDGE_STEP, FP_PROD_STEP, FP_SWITCH_STEP, AdaHedge, OneWaySwitch, ProdAB
-from ._core import ALPHA_COV, CLIP_K, DECIDE_EVERY, EVERY, GAMMA_Q, LAM, N_MIN, SCALE_FLOOR, T_MAX
+from ._core import ALPHA_COV, CLIP_K, DECIDE_EVERY, EVERY, GAMMA_Q, LAM, N_MIN, SCALE_FLOOR, T_MAX, Core
+from ._dormancy import DormantPrecisionExpert
 from ._engine import ChangeEngine
 from ._precision import PrecisionExpert
+from ._removal import core_class
 from .model import Event, Forecast
 from .model import Lebre as LebreCore
 
@@ -28,7 +35,7 @@ GATE_EPS, GATE_ALPHA = 0.002, 0.01
 FP_GATE_STEP = 16             # clipped losses, increment and exponential means of the gate audit
 FP_NORMALISATION = 3          # running maximum with forgetting and the two divisions
 _FORMAT = "lebre-state"
-_FORMAT_VERSION = 2
+_FORMAT_VERSION = 3
 
 
 def _fin(v):
@@ -36,7 +43,7 @@ def _fin(v):
 
 
 class Lebre:
-    """Online one-step-ahead forecaster for a target driven by exogenous inputs (LEBRE v0.53).
+    """Online one-step-ahead forecaster for a target driven by exogenous inputs (LEBRE v0.54).
 
     Parameters
     ----------
@@ -47,17 +54,30 @@ class Lebre:
     reference : trivial reference of layer M2 — "zero" (only for targets that are changes, e.g. financial returns),
         "persistence" (last observed value) or "seasonal" (value one season ago). None: "seasonal" if a season is
         declared, otherwise "persistence".
-    core_only : True switches M1 and M2 off; the forecasts are then identical, bit for bit, to `LebreCore` (lebre 0.1.0).
+    core_only : True switches M1 and M2 off (the structural core alone). With cheap_equivalents and triggered_removal also
+        False, the forecasts are identical, bit for bit, to `LebreCore` (lebre 0.1.0).
+    dormancy : M1 sleeps while its weight stays below 1e-3 and wakes by evidence (v0.54, M5a).
+    cheap_equivalents : the report of equivalent inputs is updated by rows from one sample every 31 steps (v0.54, M5b);
+        no effect on forecasts or decisions, only on cost and on `equivalent_inputs`.
+    triggered_removal : a removal test with per-episode evidence and its own error budget opens when a unit's mean
+        contribution falls below half its peak (v0.54, M4).
+    With dormancy, cheap_equivalents and triggered_removal all False, the forecasts are those of lebre 0.2.0 (LEBRE v0.53).
 
     Usage: for each step, ``f = model.predict(x)`` with the current inputs, then ``model.observe(y)`` once the target
     is known (``None``/NaN for a missing target). ``step(x, y)`` does both.
     """
 
     def __init__(self, n_inputs: int, season: Optional[int] = None, season2: Optional[int] = None,
-                 standardize: bool = True, reference: Optional[str] = None, core_only: bool = False):
+                 standardize: bool = True, reference: Optional[str] = None, core_only: bool = False,
+                 dormancy: bool = True, cheap_equivalents: bool = True, triggered_removal: bool = True):
         self.core = LebreCore(n_inputs, season=season, season2=season2, standardize=standardize)
         self.n_inputs, self.season, self.season2 = self.core.n_inputs, season, season2
         self.core_only = bool(core_only)
+        self.cheap_equivalents, self.triggered_removal = bool(cheap_equivalents), bool(triggered_removal)
+        self.dormancy = bool(dormancy) and not self.core_only
+        cls = core_class(self.cheap_equivalents, self.triggered_removal)
+        if cls is not Core:                                             # v0.54 changes to the core (M5b, M4)
+            self.core._core = cls(self.n_inputs, season=season, season2=season2)
         if reference is None:
             reference = "seasonal" if season else "persistence"
         if reference not in REFERENCES:
@@ -67,7 +87,7 @@ class Lebre:
         self.reference = reference
         if self.core_only:
             return
-        self._m1 = PrecisionExpert(self.n_inputs)
+        self._m1 = (DormantPrecisionExpert if self.dormancy else PrecisionExpert)(self.n_inputs)
         self._L_core = None
         self._hist = deque(maxlen=season) if reference == "seasonal" else None
         self._last_y = None
@@ -229,6 +249,15 @@ class Lebre:
                 "s": float(self._prod.s())}
 
     @property
+    def dormancy_state(self) -> Optional[dict]:
+        """state of M1 dormancy (None without it): dormant now, times it slept, woke and woke on trial, dormant steps"""
+        if not getattr(self, "dormancy", False):
+            return None
+        m = self._m1
+        return {"dormant": m.dormant, "sleeps": m.sleeps, "wakes": m.wakes, "trials": m.trials,
+                "dormant_steps": m.dormant_steps}
+
+    @property
     def n_steps(self) -> int:
         return self.core.n_steps
 
@@ -256,16 +285,22 @@ class Lebre:
 
     @classmethod
     def load(cls, path) -> "Lebre":
-        """Load a state saved by `save` (version 2: Lebre; version 1: LebreCore of lebre 0.1.0). Only load files you
-        trust: unpickling can execute code."""
+        """Load a state saved by `save` (version 3: Lebre of lebre 0.3.0; version 2: Lebre of lebre 0.2.0, which goes on
+        as LEBRE v0.53; version 1: LebreCore of lebre 0.1.0). Only load files you trust: unpickling can execute code."""
         with open(Path(path), "rb") as fh:
             obj = pickle.load(fh)
         if not isinstance(obj, dict) or obj.get("format") != _FORMAT:
             raise ValueError("not a LEBRE state file")
-        if obj.get("version") not in (1, _FORMAT_VERSION):
+        if obj.get("version") not in (1, 2, _FORMAT_VERSION):
             raise ValueError(f"unsupported state format version {obj.get('version')}")
-        return obj["model"]
+        model = obj["model"]
+        if obj["version"] == 2:                                         # lebre 0.2.0: none of the v0.54 changes
+            for k in ("dormancy", "cheap_equivalents", "triggered_removal"):
+                model.__dict__.setdefault(k, False)
+        return model
 
     def __repr__(self):
         return (f"Lebre(n_inputs={self.n_inputs}, season={self.season}, season2={self.season2}, "
-                f"reference={self.reference!r}, core_only={self.core_only}, steps={self.n_steps}, structure={self.structure})")
+                f"reference={self.reference!r}, core_only={self.core_only}, dormancy={self.dormancy}, "
+                f"cheap_equivalents={self.cheap_equivalents}, triggered_removal={self.triggered_removal}, "
+                f"steps={self.n_steps}, structure={self.structure})")
