@@ -8,7 +8,7 @@ joint dynamics (M1 takes over), returns with reference zero and a shock, and a r
 
 Two levels, as for the core: bit for bit in the reference environment (Windows, CPython 3.11, NumPy 2.2.5); elsewhere,
 identical decisions (core and gate audit) and forecasts within 1e-9 of their scale. A third test checks that
-core_only=True with the v0.54 core changes off reproduces lebre 0.1.0 exactly.
+core_only=True with the v0.54 and v0.55 core changes off reproduces lebre 0.1.0 exactly.
 """
 import functools
 import json
@@ -21,7 +21,7 @@ import pytest
 
 from lebre import Lebre, LebreCore
 
-V053 = dict(dormancy=False, cheap_equivalents=False, triggered_removal=False)
+V053 = dict(dormancy=False, cheap_equivalents=False, triggered_removal=False, anchored=False)
 
 FIX1 = Path(__file__).parent / "fixtures"
 FIX = Path(__file__).parent / "fixtures_v053"
@@ -76,7 +76,7 @@ def test_core_only_is_lebre_0_1_0(name):
     Z = dict(np.load(FIX1 / f"{name}.npz")); meta = json.load(open(FIX1 / f"{name}.json", encoding="utf-8"))   # load once
     X, y, q = Z["X"], Z["y"], Z["q"]
     a = Lebre(X.shape[1], season=meta["season"], season2=meta["season2"], core_only=True, cheap_equivalents=False,
-              triggered_removal=False)
+              triggered_removal=False, anchored=False)
     f = np.array([a.step(X[t], None if not np.isfinite(y[t]) else float(y[t]), bool(q[t])).value for t in range(len(y))])
     assert isinstance(a.core, LebreCore) and a.layer_weights is None
     assert [(e.t, e.outcome, e.samples) for e in a.events] == [(t, o, n) for t, o, k, ad, r, le, n in meta["events"]]

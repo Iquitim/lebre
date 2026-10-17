@@ -6,13 +6,13 @@
 
 Online one-step-ahead forecasting for a target driven by exogenous inputs, with **statistically tested structural changes**, a **precision expert** and a **trivial-reference starting point**, at a fixed cost of a few hundred to under two thousand floating-point operations per step.
 
-`lebre 0.3.0` implements **LEBRE v0.54**, the research version promoted on 2026-10-13 by a pre-registered rule (with errata 01 of 2026-10-14). The research record (code, pre-registrations, evaluations, stress audit, self-contained specification) is https://doi.org/10.5281/zenodo.23376152 (repository: https://github.com/Iquitim/lebre-research) (specification: `docs/architecture/pdf/LEBRE_ARCHITECTURE_v0.54_SPEC_EN.pdf`).
+`lebre 0.4.0` implements **LEBRE v0.55**, the research version promoted on 2026-10-17 by a pre-registered binding rule. The research record (code, pre-registrations, evaluations, external comparison, self-contained specification) is https://doi.org/10.5281/zenodo.23443154 (repository: https://github.com/Iquitim/lebre-research) (specification: `docs/architecture/pdf/LEBRE_ARCHITECTURE_v0.55_SPEC_EN.pdf`).
 
 The package reproduces the promoted research code **bit for bit in the reference environment** (Windows, CPython 3.11, NumPy 2.2.5), checked against references generated from that code. On other platforms and NumPy versions, floating-point rounding differs in the last bits: the regression tests then require identical decisions and forecasts equal within 1e-9 of their scale.
 
 ```bash
-pip install lebre            # 0.3.0: LEBRE v0.54
-pip install "lebre==0.2.0"   # previous releases stay available (0.2.0: LEBRE v0.53; 0.1.0: LEBRE v0.52-r1)
+pip install lebre            # 0.4.0: LEBRE v0.55
+pip install "lebre==0.3.0"   # previous releases stay available (0.3.0: LEBRE v0.54; 0.2.0: LEBRE v0.53; 0.1.0: LEBRE v0.52-r1)
 ```
 
 ## Usage
@@ -38,17 +38,18 @@ model.save("state.pkl"); model = Lebre.load("state.pkl")   # pickle: load only f
 
 **The trivial reference.** Layer M2 starts from a reference: `reference="seasonal"` (value one season ago; the default when a season is declared), `"persistence"` (last observed value; the default otherwise) or `"zero"` — declare `"zero"` only for targets that are changes, such as financial returns.
 
-**The previous versions.** `Lebre(..., dormancy=False, cheap_equivalents=False, triggered_removal=False)` gives exactly the forecasts of `lebre 0.2.0` (LEBRE v0.53). `LebreCore`, the same class as in 0.1.0, gives exactly the forecasts of `lebre 0.1.0` (the structural core alone, at about half the cost); `Lebre(..., core_only=True)` is the structural core of v0.54 (with `cheap_equivalents=False, triggered_removal=False`, that of 0.1.0).
+**The previous versions.** `Lebre(..., anchored=False)` gives exactly the forecasts of `lebre 0.3.0` (LEBRE v0.54); `Lebre(..., dormancy=False, cheap_equivalents=False, triggered_removal=False, anchored=False)` those of `lebre 0.2.0` (LEBRE v0.53). `LebreCore`, the same class as in 0.1.0, gives exactly the forecasts of `lebre 0.1.0` (the structural core alone, at about half the cost); `Lebre(..., core_only=True)` is the structural core of v0.55 (with `anchored=False, cheap_equivalents=False, triggered_removal=False`, that of 0.1.0).
 
 See `examples/quickstart.py`.
 
 ## What it does
 
-- **Structural core** (LEBRE v0.52-r1, with two changes in v0.54):
+- **Structural core** (LEBRE v0.52-r1, with two changes in v0.54 and the anchored core of v0.55):
   - a memory of the target's own past (level, declared cycle(s), per-phase profile) and a linear regression on the current inputs, combined by dynamic model averaging;
   - structural changes run in shadow as experiments (adding, removing or swapping a whole input, or refining its lag response by hierarchical splits of octave bands), accepted only when an anytime-valid e-process of predictive improvement crosses a level fixed by an online multiple-testing rule;
   - **triggered removal tests** (v0.54): when a unit's mean contribution falls below half its peak, a removal test opens with a new hypothesis, evidence from that episode only and its own error budget (the original periodic tests stay);
   - a **cheap report of equivalent inputs** (v0.54): updated by rows from one sample every 31 steps, with no effect on forecasts or decisions;
+  - the **anchored core** (v0.55): an input is accepted only if it improves the core forecast, which already contains the target's own past (the target's past and the residual state are tested against the level structure); an **innovation structure**, with the same accepted units and its own weights, carries their information to the forecast when the target is integrated; internal units are screened with the residual of the core forecast; the test scale is measured on one step and computed before the target is seen;
   - output safeguards: target gaps are held, and forecasts stay within an envelope of the observed values.
 - **M1, precision expert:** a recursive least-squares regression on the target's last two values and lag-band means of the (up to five) most correlated inputs, combined with the core forecast by AdaHedge on squared errors; where it does not help, its weight goes to zero. **Dormancy** (v0.54): while its weight stays below 10⁻³ for 2,000 targets, M1 sleeps (computed only on sample steps) and wakes when the samples show evidence that it would help.
 - **M2, trivial-reference starting point:** the output mixes the reference and the adaptive forecast through a conservative path (AdaHedge) and a one-way switch, combined by an (A,B)-Prod that guarantees not falling far behind the conservative path. An e-process audits the switches (logged as `change="gate"` events).
@@ -58,9 +59,10 @@ See `examples/quickstart.py`.
 
 Stated honestly; details in the specification (§22):
 - one step ahead only; few inputs, approximately linear relations;
+- in the pre-registered final evaluation of v0.55 (84 reserved series: basins, buildings, wind and solar plants, ECB euro rates), no family was worse than v0.54 beyond the margin (ratio 0.993 to 1.008), placebo random-walk inputs ended in the structure on 0 of 84 series (v0.54: 4 of 84) and the median per-series cost was 0.989 of v0.54's; on basins there is a small significant loss against v0.54 (1.008, 95% CI 1.003–1.014) and an ARX with recursive least squares of the same cost class errs 11% to 13% less; the gain on integrated series was shown on synthetic data only, and weak real relations are registered as structure more slowly;
 - in the pre-registered final evaluation of v0.54 (93 series reserved before any v0.54 code: basins, buildings, wind and solar plants, EIA price and US Treasury rate levels), the error was kept against v0.53 (ratio 0.989 to 1.000 per family, no harm in any family) and the median per-series cost was 0.905 of v0.53's (95% CI 0.857–0.932); there is no cost cut where M1 helps (basins). In the previous evaluation (104 series), LEBRE v0.53 had 4.5% lower mean squared error than the core alone (ratio 0.955, 95% CI 0.951–0.960), with the gain from basins and FX;
 - a relation that disappears for more than about 5,200 steps and returns is removed and must be re-detected: +5% to +10% error on series with that pattern (declared limit of v0.54);
-- spurious inputs in level series can still be accepted, and the cycle must be declared;
+- the cycle must be declared; inputs that only wander are no longer accepted in level series (v0.55), but substitute inputs and non-linear relations are outside that guarantee;
 - it is **not** meant to be the most accurate forecaster: against Chronos-2 with covariates (a foundation model of ~10⁹ operations per forecast) the error ratio of v0.54 ranged from 0.84 to 1.34 per family;
 - cost: median 870 and maximum 1,245 operations per step (mean per series) in the final evaluation of v0.54; per-step peak at most 1.054 times v0.53's in the stress audit; state memory estimated at ~85 KB (the core was measured on a simulated Cortex-M4F; M1, M2 and the v0.54 changes were not);
 - the core's testing mechanism does not improve accuracy over switching all inputs on; an accepted input means *it improved the forecast of the current model, with evidence*, not *it is the cause*;
@@ -75,5 +77,5 @@ Apache-2.0.
 
 If you use the library, please cite the research record it implements and the library version you used (see `CITATION.cff`):
 
-- research record of LEBRE v0.54: https://doi.org/10.5281/zenodo.23376152 (repository: https://github.com/Iquitim/lebre-research);
+- research record of LEBRE v0.55: https://doi.org/10.5281/zenodo.23443154 (repository: https://github.com/Iquitim/lebre-research);
 - `lebre 0.3.0`: https://doi.org/10.5281/zenodo.23376599; `lebre 0.2.0`: https://doi.org/10.5281/zenodo.23282624; `lebre 0.1.0`: https://doi.org/10.5281/zenodo.23073984; `10.5281/zenodo.23073983` resolves to the latest version of the library.

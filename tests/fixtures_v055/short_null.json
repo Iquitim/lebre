@@ -1,0 +1,44 @@
+{
+ "inputs": "fixtures",
+ "season": null,
+ "season2": null,
+ "reference": null,
+ "events": [
+  [
+   190,
+   "accepted",
+   "gate",
+   6.08,
+   190
+  ],
+  [
+   490,
+   "closed",
+   "add",
+   -0.3,
+   100
+  ],
+  [
+   1370,
+   "closed",
+   "add",
+   -0.06,
+   100
+  ]
+ ],
+ "cost_per_step": 485.7762,
+ "coverage": 0.8986666666666666,
+ "m1_weight": 2.1351449724488334e-15,
+ "dormancy": {
+  "dormant": true,
+  "sleeps": 1,
+  "wakes": 0,
+  "trials": 0,
+  "dormant_steps": 741
+ },
+ "triggered_removals": 0,
+ "wS": 0.9999833489484188,
+ "wI": 1.3233359451707994e-05,
+ "structure": [],
+ "equivalents": null
+}

@@ -13,7 +13,7 @@ def _data(T=3000, seed=0):
 
 
 def test_versions():
-    assert __version__ == "0.3.0" and ALGORITHM_VERSION == "LEBRE v0.54" and CORE_ALGORITHM_VERSION == "LEBRE v0.52-r1"
+    assert __version__ == "0.4.0" and ALGORITHM_VERSION == "LEBRE v0.55" and CORE_ALGORITHM_VERSION == "LEBRE v0.52-r1"
 
 
 def test_predict_observe_equals_step():
@@ -130,11 +130,12 @@ def test_core_state_files_of_0_1_0_still_load(tmp_path):
     assert isinstance(b, LebreCore) and b.n_steps == 500
 
 
-V053 = dict(dormancy=False, cheap_equivalents=False, triggered_removal=False)
+V053 = dict(dormancy=False, cheap_equivalents=False, triggered_removal=False, anchored=False)
 
 
-@pytest.mark.parametrize("flags", [dict(dormancy=d, cheap_equivalents=c, triggered_removal=r)
-                                   for d in (False, True) for c in (False, True) for r in (False, True)])
+@pytest.mark.parametrize("flags", [dict(dormancy=d, cheap_equivalents=c, triggered_removal=r, anchored=a)
+                                   for d in (False, True) for c in (False, True) for r in (False, True)
+                                   for a in (False, True) if not a or (c and r)])
 def test_save_load_roundtrip_for_every_combination(tmp_path, flags):
     X, y = _data(1600)
     a = Lebre(2, **flags)
@@ -142,8 +143,9 @@ def test_save_load_roundtrip_for_every_combination(tmp_path, flags):
         a.step(X[t], y[t])
     p = tmp_path / "state.pkl"; a.save(p)
     b = Lebre.load(p)
-    assert type(b.core._core) is type(a.core._core) and (b.dormancy, b.cheap_equivalents, b.triggered_removal) == (
-        flags["dormancy"], flags["cheap_equivalents"], flags["triggered_removal"])
+    assert type(b.core._core) is type(a.core._core) and (b.dormancy, b.cheap_equivalents, b.triggered_removal,
+                                                          b.anchored) == (
+        flags["dormancy"], flags["cheap_equivalents"], flags["triggered_removal"], flags["anchored"])
     for t in range(800, 1600):
         fa, fb = a.step(X[t], y[t]), b.step(X[t], y[t])
         assert np.array_equal([fa.value, fa.lower, fa.upper], [fb.value, fb.lower, fb.upper], equal_nan=True)
@@ -176,9 +178,27 @@ def test_state_files_of_0_2_0_still_load_and_go_on_as_v053(tmp_path):
     assert "dormancy=False" in repr(b)
 
 
-def test_flags_off_is_v053_and_defaults_are_v054():
+def test_flags_off_is_v053_and_defaults_are_v055():
     m = Lebre(2)
-    assert (m.dormancy, m.cheap_equivalents, m.triggered_removal) == (True, True, True)
-    assert type(m.core._core).__name__ == "TriggeredRemovalCheapCore" and type(m._m1).__name__ == "DormantPrecisionExpert"
+    assert (m.dormancy, m.cheap_equivalents, m.triggered_removal, m.anchored) == (True, True, True, True)
+    assert type(m.core._core).__name__ == "AnchoredCore" and type(m._m1).__name__ == "DormantPrecisionExpert"
+    assert type(Lebre(2, anchored=False).core._core).__name__ == "TriggeredRemovalCheapCore"
+    with pytest.raises(ValueError):
+        Lebre(2, triggered_removal=False)
     v = Lebre(2, **V053)
     assert type(v.core._core).__name__ == "Core" and type(v._m1).__name__ == "PrecisionExpert"
+
+
+def test_state_files_of_0_3_0_still_load_and_go_on_as_v054(tmp_path):
+    import pickle
+    X, y = _data(1600)
+    a, ref = Lebre(2, anchored=False), Lebre(2, anchored=False)
+    for t in range(800):
+        a.step(X[t], y[t]); ref.step(X[t], y[t])
+    del a.__dict__["anchored"]                         # a Lebre of lebre 0.3.0 has no such attribute
+    p = tmp_path / "v030.pkl"
+    pickle.dump({"format": "lebre-state", "version": 3, "model": a}, open(p, "wb"))
+    b = Lebre.load(p)
+    assert b.anchored is False and type(b.core._core).__name__ == "TriggeredRemovalCheapCore"
+    for t in range(800, 1600):
+        assert b.step(X[t], y[t]).value == ref.step(X[t], y[t]).value

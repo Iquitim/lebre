@@ -1,5 +1,43 @@
 # Changelog
 
+## 0.4.0 — 2026-10-17
+
+Implements **LEBRE v0.55** (canonical configuration), promoted on 2026-10-17 by a pre-registered binding rule in the
+research record (https://doi.org/10.5281/zenodo.23443154; frozen prototype at commit b0522a0, variant B10).
+
+**Changed:** `Lebre` is now LEBRE v0.55. One new switch, `anchored`, on by default, changes the structural core:
+- external units (each input and its splits) are tested against the core forecast, which already contains the memory of
+  the target, and their removal discounts their exact contribution to it; internal units (the target's own past, the
+  residual state and the splits of the target's past) are still tested against the level structure;
+- an innovation structure predicts what the memory does not, with the same accepted units and its own weights, and
+  enters through a second dynamic average: L1 = m + wS (s - m), L = L1 + wI ((m + s_d) - L1); an accepted unit enters
+  it with the challenger's weights if external and with zero if internal;
+- internal units are screened with the residual of the core forecast (a soft gate);
+- the floor of the test scale is 0.1 sqrt(min(variance of the level, variance of the first difference)), computed
+  before the target is seen.
+
+With `anchored=False`, the forecasts are those of 0.3.0 (LEBRE v0.54), bit for bit in the reference environment.
+`anchored=True` needs `cheap_equivalents=True` and `triggered_removal=True` (the evaluated configuration); other
+combinations raise `ValueError`. `pip install "lebre==0.3.0"` remains available.
+
+**New:** state format 4. State files of 0.3.0 still load with `Lebre.load` and go on as LEBRE v0.54; those of 0.2.0 and
+0.1.0 too.
+
+**Fidelity.** In the reference environment (Windows, CPython 3.11, NumPy 2.2.5), forecasts, interval, events, cost
+accounting, coverage, the M1 weight, the dormancy state, the accepted triggered removals, the final weights wS and wI,
+the structure and the reports of equivalent inputs are bit-for-bit identical to the frozen research prototype on sixteen
+scenarios (`tests/test_v055.py`: the thirteen of 0.3.0 plus an integrated target whose differences follow an input, a
+random walk with unrelated wandering inputs, and an integrated target driven by one input with three wandering decoys).
+The new module `_anchored.py` transcribes the prototype's B10 path; the branches of the prototype's switches that are off
+in v0.55 were left out. The modules of 0.3.0 other than `full.py` and `__init__.py` are unchanged.
+
+**Evidence and limits** (research record, specification §19 and §22): in the final evaluation (84 reserved series:
+basins, buildings, wind and solar plants, ECB euro rates), no family was worse than v0.54 beyond the margin (ratio 0.993
+to 1.008), placebo random-walk inputs ended in the structure on 0 of 84 series (v0.54: 4) and the median per-series cost
+was 0.989 of v0.54's. Limits: on basins, a small significant loss against v0.54 (1.008) and a recursive-least-squares ARX
+of the same cost class is better; the gain on integrated series was shown on synthetic data only; weak real relations are
+registered as structure more slowly.
+
 ## 0.3.0 — 2026-10-14
 
 Implements **LEBRE v0.54** (canonical configuration), promoted on 2026-10-13 by a pre-registered rule in the research

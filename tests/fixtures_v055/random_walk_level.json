@@ -1,0 +1,109 @@
+{
+ "inputs": "fixtures_v053",
+ "season": null,
+ "season2": null,
+ "reference": "persistence",
+ "events": [
+  [
+   990,
+   "closed",
+   "add",
+   -0.36,
+   107
+  ],
+  [
+   1420,
+   "accepted",
+   "add",
+   6.53,
+   227
+  ],
+  [
+   1520,
+   "closed",
+   "remove",
+   -1.87,
+   100
+  ],
+  [
+   3660,
+   "closed",
+   "split",
+   -0.19,
+   100
+  ],
+  [
+   3760,
+   "closed",
+   "remove",
+   -2.54,
+   100
+  ],
+  [
+   4530,
+   "closed",
+   "remove",
+   -1.24,
+   100
+  ],
+  [
+   5030,
+   "accepted",
+   "split",
+   5.08,
+   120
+  ],
+  [
+   5760,
+   "closed",
+   "remove",
+   -3.06,
+   100
+  ],
+  [
+   6870,
+   "closed",
+   "split",
+   -0.38,
+   210
+  ],
+  [
+   7320,
+   "closed",
+   "remove",
+   -1.11,
+   100
+  ],
+  [
+   7760,
+   "closed",
+   "remove",
+   -3.65,
+   100
+  ],
+  [
+   7780,
+   "closed",
+   "add",
+   -0.17,
+   120
+  ]
+ ],
+ "cost_per_step": 746.3556750000007,
+ "coverage": 0.8987468671679198,
+ "m1_weight": 0.9999999752574689,
+ "dormancy": {
+  "dormant": false,
+  "sleeps": 1,
+  "wakes": 1,
+  "trials": 0,
+  "dormant_steps": 841
+ },
+ "triggered_removals": 0,
+ "wS": 6.560515607551034e-39,
+ "wI": 0.6383533531843992,
+ "structure": [
+  "own_past"
+ ],
+ "equivalents": null
+}

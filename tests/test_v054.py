@@ -2,7 +2,7 @@
 inputs + M1 with dormancy + M2) against the promoted research implementation.
 
 The fixtures (tests/fixtures_v054/) were produced by dev/make_fixtures_v054.py from the promoted prototype (commit f9906c4,
-canonical call). They reuse the ten scenarios of tests/fixtures_v053/ and add three: a target where M1 sleeps while a
+canonical call), run here with anchored=False (lebre 0.3.0). They reuse the ten scenarios of tests/fixtures_v053/ and add three: a target where M1 sleeps while a
 later joint dynamics is absorbed by the core, a relation that vanishes for good and is removed by a triggered test, and
 forty inputs in correlated groups whose reports of equivalent inputs are queried in the middle of an update cycle.
 
@@ -40,7 +40,7 @@ def _reports(m, d):
 def _run(name):
     meta = json.load(open(FIX / f"{name}.json", encoding="utf-8")); E = np.load(FIX / f"{name}.npz")
     X, y, q = _inputs(name, meta)
-    m = Lebre(X.shape[1], season=meta["season"], season2=meta["season2"], reference=meta["reference"])
+    m = Lebre(X.shape[1], season=meta["season"], season2=meta["season2"], reference=meta["reference"], anchored=False)
     f, lo, hi = (np.empty(len(y)) for _ in range(3))
     eq = {}
     for t in range(len(y)):
