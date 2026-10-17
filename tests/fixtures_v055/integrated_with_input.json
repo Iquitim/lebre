@@ -1,0 +1,201 @@
+{
+ "inputs": "here",
+ "season": null,
+ "season2": null,
+ "reference": null,
+ "events": [
+  [
+   1260,
+   "accepted",
+   "add",
+   6.16,
+   350
+  ],
+  [
+   1310,
+   "accepted",
+   "add",
+   6.25,
+   655
+  ],
+  [
+   1360,
+   "closed",
+   "remove",
+   -0.63,
+   100
+  ],
+  [
+   1410,
+   "closed",
+   "remove",
+   -0.55,
+   100
+  ],
+  [
+   1820,
+   "closed",
+   "split",
+   -0.18,
+   150
+  ],
+  [
+   2110,
+   "closed",
+   "add",
+   -0.35,
+   100
+  ],
+  [
+   2130,
+   "accepted",
+   "gate",
+   10.8,
+   870
+  ],
+  [
+   2400,
+   "closed",
+   "remove",
+   -0.4,
+   580
+  ],
+  [
+   2460,
+   "closed",
+   "split",
+   -0.26,
+   100
+  ],
+  [
+   2870,
+   "closed",
+   "split",
+   -0.11,
+   100
+  ],
+  [
+   3360,
+   "closed",
+   "remove",
+   -1.08,
+   100
+  ],
+  [
+   3420,
+   "closed",
+   "remove",
+   -0.88,
+   110
+  ],
+  [
+   3720,
+   "closed",
+   "split",
+   -0.14,
+   100
+  ],
+  [
+   3920,
+   "closed",
+   "remove",
+   -2.06,
+   100
+  ],
+  [
+   5300,
+   "closed",
+   "add",
+   -0.45,
+   240
+  ],
+  [
+   5400,
+   "closed",
+   "remove",
+   -1.4,
+   100
+  ],
+  [
+   5420,
+   "closed",
+   "split",
+   -0.48,
+   100
+  ],
+  [
+   5520,
+   "closed",
+   "remove",
+   -1.53,
+   100
+  ],
+  [
+   6180,
+   "closed",
+   "remove",
+   -1.61,
+   100
+  ],
+  [
+   6270,
+   "closed",
+   "split",
+   -0.32,
+   100
+  ],
+  [
+   6650,
+   "closed",
+   "add",
+   -0.1,
+   100
+  ],
+  [
+   7400,
+   "closed",
+   "remove",
+   -1.6,
+   100
+  ],
+  [
+   7520,
+   "closed",
+   "remove",
+   -1.87,
+   100
+  ],
+  [
+   7700,
+   "closed",
+   "remove",
+   -0.91,
+   100
+  ],
+  [
+   8160,
+   "closed",
+   "add",
+   -0.6,
+   450
+  ]
+ ],
+ "cost_per_step": 810.9112666666673,
+ "coverage": 0.8986666666666666,
+ "m1_weight": 0.0017421085417598204,
+ "dormancy": {
+  "dormant": false,
+  "sleeps": 2,
+  "wakes": 2,
+  "trials": 0,
+  "dormant_steps": 2575
+ },
+ "triggered_removals": 0,
+ "wS": 1.8720737047233438e-07,
+ "wI": 0.9999999999999998,
+ "structure": [
+  "x0",
+  "own_past"
+ ],
+ "equivalents": null
+}

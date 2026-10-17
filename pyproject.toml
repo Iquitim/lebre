@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "lebre"
-version = "0.3.0"
+version = "0.4.0"
 description = "Online one-step-ahead forecasting with statistically tested structural changes, a precision expert and a trivial-reference starting point, at a fixed cost per step (implements LEBRE v0.54)."
 readme = "README.md"
 license = "Apache-2.0"
